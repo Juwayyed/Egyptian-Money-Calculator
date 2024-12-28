@@ -53,20 +53,13 @@ function totalCash() {
 
 // Sum in Words (Logic OK - But Needs Refactoring)
 function convertToWords (number) {
+    
     if(number === 0) {
         return 'Zero';
     }
-    
-    let words = '';
 
-    //Fractions (i.e. Change) ///////////////////////// Bug /////////////////////////////
-    if((number % 1) === 0.25) {
-        words += change[0];
-    } else if((number % 1) === 0.50) {
-        words += change[1];
-    } else if((number % 1) === 0.75) {
-        words += change[2];
-    }
+    let words = '';
+    let numb = Math.floor(number);
 
     //Trillions
     if(Math.floor(number / 1000000000000) > 0) {
@@ -98,25 +91,35 @@ function convertToWords (number) {
         number %= 100;
     }
 
-    if(number > 0) {
-        //Tens
-        if(number < 10) {
-            words += oneToNine[number];
-        // Ten to Nineteen
-        } else if(number < 20) {
-            words += tenToNineteen[number - 10]; // ex: 15 - 10 => 5 ... tenToNineteen[5]
-        } 
-        // Tens & Digits
-        else if(number >= 20) {
-            // To split the value into two..ex: 25 => 20 + 5
-            words += tens[Math.floor(number / 10)];
-            if(number % 10 > 0) {
-                words += ' ' + oneToNine[number % 10];
-            }
+    //20 - 99
+    if(number >= 20 && number < 100) {
+        // To split the value into two..ex: 25 => 20 + 5
+        words += tens[Math.floor(number / 10)];
+        if(number % 10 > 0) {
+            words += ' ' + oneToNine[numb % 10];
         }
     }
-    return words.trim();
-}
+
+    //10 - 19
+    if(number >= 10 && number < 20) {
+        words += tenToNineteen[number - 10]; // ex: 15 - 10 => 5 ... tenToNineteen[5]
+    }
+
+    //1 - 9
+    if(number >= 1 && number <= 9) {
+        words += oneToNine[numb];
+    }
+        //Fractions
+        if((number % 1) === 0.25) {
+            words += " " + change[0]; 
+        } else if((number % 1) === 0.50) {
+            words += " " + change[1];
+        } else if((number % 1) === 0.75) {
+            words += " " + change[2];
+        }
+
+        return words.trim();
+    }
 
 // Reset Data Functionality
 function resetData() {
