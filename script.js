@@ -27,10 +27,9 @@ const cashInputs = [TwentyFivePiasters, FiftyPiasters, OnePound, FivePounds, Ten
 const cashTexts = [txt025, txt050, txt1, txt5, txt10, txt20, txt50, txt100, txt200];
 
 const change = ['Twenty-Five Piasters', 'Fifty Piasters', 'Seventy-Five Piasters'];
-const oneToNine = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']; // 0-9
-const tenToNineteen = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']; // 10-19
-const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']; // 20-90
-////////////////////////////////////////////////////////////////////////
+const oneToNine = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+const tenToNineteen = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
 /* Functions */
 // The Calculator
@@ -47,79 +46,92 @@ function totalCash() {
     cashTexts.forEach((text) => {
         totalCashValue += +(text.textContent);
     })
-    FinalSum.textContent = "Total Cash: " + parseFloat(totalCashValue);
+    FinalSum.textContent = "Total Cash: " + parseFloat(totalCashValue).toFixed(2) + " EGP";
     FinalSumInWords.textContent = `Total Cash in Words: ${convertToWords(totalCashValue)}`;
 }
 
 // Sum in Words (Logic OK - But Needs Refactoring)
-function convertToWords (number) {
-    
-    if(number === 0) {
+function convertToWords(number) {
+    if (number === 0) {
         return 'Zero';
     }
-
     let words = '';
-    let numb = Math.floor(number);
+    let integerPart = Math.floor(number);
+    let decimalPart = (number % 1);
+
+    words += convertIntegerToWords(integerPart);
+
+    if (decimalPart > 0) {
+         if(decimalPart === 0.25) {
+            words += " " + change[0];
+        } else if (decimalPart === 0.50) {
+            words += " " + change[1];
+        } else if (decimalPart === 0.75) {
+           words += " " + change[2];
+        }
+    }
+
+    return words.trim();
+}
+
+function convertIntegerToWords(number) {
+    if (number === 0) {
+        return '';
+    }
+    let words = '';
 
     //Trillions
-    if(Math.floor(number / 1000000000000) > 0) {
-        words += convertToWords(Math.floor(number / 1000000000000)) + ' Trillion ';
+    if (Math.floor(number / 1000000000000) > 0) {
+        words += convertIntegerToWords(Math.floor(number / 1000000000000)) + ' Trillion ';
         number %= 1000000000000;
     }
 
     //Billions
-    if(Math.floor(number / 1000000000) > 0) {
-        words += convertToWords(Math.floor(number / 1000000000)) + ' Billion ';
+    if (Math.floor(number / 1000000000) > 0) {
+        words += convertIntegerToWords(Math.floor(number / 1000000000)) + ' Billion ';
         number %= 1000000000;
     }
 
     //Millions
-    if(Math.floor(number / 1000000) > 0) {
-        words += convertToWords(Math.floor(number / 1000000)) + ' Million ';
+    if (Math.floor(number / 1000000) > 0) {
+        words += convertIntegerToWords(Math.floor(number / 1000000)) + ' Million ';
         number %= 1000000;
     }
 
     //Thousands
-    if(Math.floor(number / 1000) > 0) {
-        words += convertToWords(Math.floor(number / 1000)) + ' Thousand ';
+    if (Math.floor(number / 1000) > 0) {
+        words += convertIntegerToWords(Math.floor(number / 1000)) + ' Thousand ';
         number %= 1000;
     }
 
     //Hundreds
-    if(Math.floor(number / 100) > 0) {
-        words += convertToWords(Math.floor(number / 100)) + ' Hundred '; // Value 1
+    if (Math.floor(number / 100) > 0) {
+        words += convertIntegerToWords(Math.floor(number / 100)) + ' Hundred ';
         number %= 100;
     }
 
     //20 - 99
-    if(number >= 20 && number < 100) {
-        // To split the value into two..ex: 25 => 20 + 5
+    if (number >= 20 && number < 100) {
         words += tens[Math.floor(number / 10)];
-        if(number % 10 > 0) {
-            words += ' ' + oneToNine[numb % 10];
+        if (number % 10 > 0) {
+            words += ' ' + oneToNine[number % 10];
         }
+         return words;
     }
 
     //10 - 19
-    if(number >= 10 && number < 20) {
-        words += tenToNineteen[number - 10]; // ex: 15 - 10 => 5 ... tenToNineteen[5]
+    if (number >= 10 && number < 20) {
+        words += tenToNineteen[number - 10];
+         return words;
     }
 
     //1 - 9
-    if(number >= 1 && number <= 9) {
-        words += oneToNine[numb];
+    if (number >= 1 && number <= 9) {
+        words += oneToNine[number];
     }
-        //Fractions
-        if((number % 1) === 0.25) {
-            words += " " + change[0]; 
-        } else if((number % 1) === 0.50) {
-            words += " " + change[1];
-        } else if((number % 1) === 0.75) {
-            words += " " + change[2];
-        }
+    return words;
+}
 
-        return words.trim();
-    }
 
 // Reset Data Functionality
 function resetData() {
@@ -131,7 +143,7 @@ function resetData() {
         text.textContent = 0;
     });
 
-    FinalSum.textContent = "Total Cash: 0";
+    FinalSum.textContent = "Total Cash: 0 EGP";
     FinalSumInWords.textContent = "Total Cash: Zero";
 }
 
@@ -149,13 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // Wrong Numbers Check Functionality
 cashInputs.forEach(input => {
     input.addEventListener("input", () => {
-        if (input.value === "" || input.value === "-") { //checks for written (-) before parseFloat /*Important*/
-            input.value = ""; //To clear the invalid input
-            return; // Exit early to avoid triggering the alert
+        if (input.value === "" || input.value === "-") {
+            input.value = "";
+            return;
         }
-        
         const value = parseFloat(input.value);
-        if (isNaN(value) || value <= 0) { //First condition we use input.value to escape the parsefloat effect which will return NaN Always
+        if (isNaN(value) || value <= 0) {
             input.value = "";
             alert("Error! Enter a Whole Positive Number with no fractions!");
         }
